@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Twitter Hide Trending
 // @namespace   Violentmonkey Scripts
-// @match       https://twitter.com/*
+// @match       https://*.twitter.com/*
 // @grant       none
 // @version     1.0
 // @author      -
@@ -102,9 +102,66 @@ function waitForKeyElements (
     waitForKeyElements.controlObj   = controlObj;
 }
 
-waitForKeyElements('[aria-label="Trending"]', hideNodes, true);
+
+// Modify XHR object to be able to access request url
+const xhrProto = XMLHttpRequest.prototype,
+    origOpen = xhrProto.open;
+
+xhrProto.open = function (method, url) {
+    this._url = url;
+    return origOpen.apply(this, arguments);
+};
+
+
+waitForKeyElements('[aria-label="Trending"]', hideNodes, false);
+waitForKeyElements('[aria-label="Who to follow"]', hideWhoToFollow, false);
+
+waitForKeyElements('[aria-label="Loading recommendations for users to follow"]', hideTimeline, false);
+waitForKeyElements('[aria-label="Loading timeline"]', hideTimeline, false);
+
+(function(send) {
+
+    XMLHttpRequest.prototype.send = function(data) {
+        console.log(this._url);
+        // block requests trying to access trending or recommended users
+        if (!this._url.startsWith('https://twitter.com/i/api/1.1/users/recommendations')
+           && !this._url.startsWith('https://twitter.com/i/api/2/guide')
+           ) {
+            send.call(this, data);
+        }
+    };
+
+})(XMLHttpRequest.prototype.send);
+
+
+function hideWhoToFollow(jNode) {
+  jNode[0].style.display = "None";
+}
+
+function hideTimeline(jNode) {
+  if (window.location.href.endsWith('home')) return;
+  jNode = jNode[0];
+  jNode.parentNode.parentNode.style.display = "None";
+  jNode.parentNode.style.display = "None";
+
+  console.log(jNode.parentNode);
+}
 
 function hideNodes(jNode) {
-  jNode[0].childNodes[0].childNodes[2].style.display= "None";
-  jNode[0].childNodes[0].childNodes[3].style.display= "None";
+  jNode = jNode[0];
+  const url = window.location.href;
+  const childNodes = jNode.childNodes[0].childNodes;
+  if (url.endsWith('home')
+        || url.endsWith('notifications')) {
+    childNodes[2].style.display= "None";
+  }
+  
+  if (childNodes.length > 3) {
+    console.log('herererer');
+    childNodes[3].style.display= "None";
+    childNodes[4].style.display= "None";
+    if (childNodes.length > 5) {
+      childNodes[5].style.display= "None";
+    }
+  }
 }
