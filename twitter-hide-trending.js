@@ -125,9 +125,9 @@ waitForKeyElements('[aria-label="Loading timeline"]', hideTimeline, false);
         console.log(this._url);
         // block requests trying to access trending or recommended users
         if (!this._url.startsWith('https://twitter.com/i/api/1.1/users/recommendations')
-           && !this._url.startsWith('https://twitter.com/i/api/2/guide')
-           ) {
-            send.call(this, data);
+            && !this._url.startsWith('https://twitter.com/i/api/2/guide')
+            ) {
+          send.call(this, data);
         }
     };
 
@@ -139,7 +139,12 @@ function hideWhoToFollow(jNode) {
 }
 
 function hideTimeline(jNode) {
-  if (window.location.href.endsWith('home')) return;
+  const url = window.location.href;
+  if (url.endsWith('home') ||
+      url.match(/.+\d+$/)) {
+    return;
+  }
+
   jNode = jNode[0];
   jNode.parentNode.parentNode.style.display = "None";
   jNode.parentNode.style.display = "None";
