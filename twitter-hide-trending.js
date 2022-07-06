@@ -125,14 +125,13 @@ waitForKeyElements('[aria-label="Loading timeline"]', hideTimeline, false);
         console.log(this._url);
         // block requests trying to access trending or recommended users
         if (!this._url.startsWith('https://twitter.com/i/api/1.1/users/recommendations')
-            && !this._url.startsWith('https://twitter.com/i/api/2/guide')
-            ) {
+           && !this._url.startsWith('https://twitter.com/i/api/2/guide')
+           ) {
           send.call(this, data);
         }
     };
 
 })(XMLHttpRequest.prototype.send);
-
 
 function hideWhoToFollow(jNode) {
   jNode[0].style.display = "None";
@@ -140,11 +139,9 @@ function hideWhoToFollow(jNode) {
 
 function hideTimeline(jNode) {
   const url = window.location.href;
-  if (url.endsWith('home') ||
-      url.match(/.+\d+$/)) {
+  if (url.endsWith('home') || url.match(/.+status\/\d+.*/)) {
     return;
   }
-
   jNode = jNode[0];
   jNode.parentNode.parentNode.style.display = "None";
   jNode.parentNode.style.display = "None";
@@ -160,7 +157,7 @@ function hideNodes(jNode) {
         || url.endsWith('notifications')) {
     childNodes[2].style.display= "None";
   }
-  
+
   if (childNodes.length > 3) {
     console.log('herererer');
     childNodes[3].style.display= "None";
