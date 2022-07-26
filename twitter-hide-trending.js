@@ -116,7 +116,7 @@ xhrProto.open = function (method, url) {
 waitForKeyElements('[aria-label="Trending"]', hideNodes, false);
 waitForKeyElements('[aria-label="Who to follow"]', hideWhoToFollow, false);
 
-waitForKeyElements('[aria-label="Loading recommendations for users to follow"]', hideTimeline, false);
+waitForKeyElements('[aria-label="Loading recommendations for users to follow"]', hideRecs, false);
 waitForKeyElements('[aria-label="Loading timeline"]', hideTimeline, false);
 
 (function(send) {
@@ -133,17 +133,34 @@ waitForKeyElements('[aria-label="Loading timeline"]', hideTimeline, false);
 
 })(XMLHttpRequest.prototype.send);
 
+
 function hideWhoToFollow(jNode) {
   jNode[0].style.display = "None";
 }
 
-function hideTimeline(jNode) {
-  const url = window.location.href;
-  if (url.endsWith('home') || url.match(/.+status\/\d+.*/)) {
-    return;
+function hideRecs(jNode) {
+    const url = window.location.href;
+  if (url.endsWith('home')
+      || url.match(/.+status\/\d+.*/)) {
+    return
   }
+
   jNode = jNode[0];
   jNode.parentNode.parentNode.style.display = "None";
+  jNode.parentNode.style.display = "None";
+}
+
+function hideTimeline(jNode) {
+  const url = window.location.href;
+  if (url.endsWith('home')
+    || url.match(/.+status\/\d+.*/)) {
+    return
+  }
+  jNode = jNode[0];
+
+  if (!url.match(/.+search.*/)) {
+    jNode.parentNode.parentNode.style.display = "None";
+  }
   jNode.parentNode.style.display = "None";
 
   console.log(jNode.parentNode);
@@ -159,7 +176,6 @@ function hideNodes(jNode) {
   }
 
   if (childNodes.length > 3) {
-    console.log('herererer');
     childNodes[3].style.display= "None";
     childNodes[4].style.display= "None";
     if (childNodes.length > 5) {
